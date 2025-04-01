@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Map, TileLayer, Marker, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import './Map.css';
 
 // Fix for default marker icon
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -23,12 +24,7 @@ const endPoint = {
   lng: 80.9462
 };
 
-interface Position {
-  lat: number;
-  lng: number;
-}
-
-function interpolatePosition(start: Position, end: Position, progress: number): Position {
+function interpolatePosition(start, end, progress) {
   return {
     lat: start.lat + (end.lat - start.lat) * progress,
     lng: start.lng + (end.lng - start.lng) * progress
@@ -36,9 +32,9 @@ function interpolatePosition(start: Position, end: Position, progress: number): 
 }
 
 // Component to handle map center updates
-function LocationMarker({ map }: { map: any }) {
-  const [position, setPosition] = useState<Position>(startPoint);
-  const [routePoints, setRoutePoints] = useState<Position[]>([startPoint]);
+function LocationMarker({ map }) {
+  const [position, setPosition] = useState(startPoint);
+  const [routePoints, setRoutePoints] = useState([startPoint]);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -69,7 +65,7 @@ function LocationMarker({ map }: { map: any }) {
         position={startPoint}
         icon={L.divIcon({
           className: 'custom-marker',
-          html: '<div class="w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-lg"></div>',
+          html: '<div class="start-marker"></div>',
           iconSize: [16, 16],
           iconAnchor: [8, 8],
         })}
@@ -80,7 +76,7 @@ function LocationMarker({ map }: { map: any }) {
         position={position}
         icon={L.divIcon({
           className: 'custom-marker',
-          html: '<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg animate-pulse"></div>',
+          html: '<div class="current-marker"></div>',
           iconSize: [16, 16],
           iconAnchor: [8, 8],
         })}
@@ -91,7 +87,7 @@ function LocationMarker({ map }: { map: any }) {
         position={endPoint}
         icon={L.divIcon({
           className: 'custom-marker',
-          html: '<div class="w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-lg"></div>',
+          html: '<div class="end-marker"></div>',
           iconSize: [16, 16],
           iconAnchor: [8, 8],
         })}
@@ -113,18 +109,18 @@ function LocationMarker({ map }: { map: any }) {
 function Map() {
   const [map, setMap] = useState(null);
 
-  const mapRef = (ref: any) => {
+  const mapRef = (ref) => {
     if (ref) {
       setMap(ref.leafletElement);
     }
   };
 
   return (
-    <div className="h-full w-full">
+    <div className="map-container">
       <Map
         center={startPoint}
         zoom={10}
-        className="h-full w-full"
+        className="map-container"
         zoomControl={true}
         attributionControl={true}
         whenCreated={mapRef}
